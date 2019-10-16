@@ -3,7 +3,9 @@ package com.droidbaza.todo.main;
 import android.content.Context;
 import androidx.fragment.app.FragmentActivity;
 import com.droidbaza.todo.database.DbClient;
-
+/**
+ * Created by droidbaza on 16/10/19.
+ */
 public class MainPresenter implements MainContract.MainPresenter {
     private MainContract.MainView view;
     private Context context;
@@ -22,8 +24,6 @@ public class MainPresenter implements MainContract.MainPresenter {
                     .myDao()
                     .getAll().observe(activity, notes -> {
                 view.showMyNotes(notes);
-            //    Log.d("NOTESS","note size " + notes.size());
-
             });
     }
 }

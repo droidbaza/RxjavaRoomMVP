@@ -1,23 +1,23 @@
 package com.droidbaza.todo.adapters;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.droidbaza.todo.R;
 import com.droidbaza.todo.second.SecondActivity;
 import com.droidbaza.todo.model.Note;
 import java.util.List;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+/**
+ * Created by droidbaza on 16/10/19.
+ */
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.MyViewHolder> {
 
     private Context context;
@@ -34,13 +34,14 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.MyViewHolder> 
 
 
     class MyViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.tv_name)
         TextView tvName;
+        @BindView(R.id.bt_del)
         Button btnDelete;
 
         MyViewHolder(View view) {
             super(view);
-            tvName = view.findViewById(R.id.tv_name);
-            btnDelete = view.findViewById(R.id.bt_del);
+            ButterKnife.bind(this, view);
         }
     }
 
@@ -55,22 +56,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.MyViewHolder> 
     public void onBindViewHolder(MyViewHolder holder, int position) {
         final Note note = noteList.get(position);
         holder.tvName.setText(note.getName());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(context, SecondActivity.class);
-                i.putExtra("nameNote",note.getName());
-                context.startActivity(i);
-                // c.startActivity(i);
-            }
+        holder.itemView.setOnClickListener(v -> {
+            Intent i = new Intent(context, SecondActivity.class);
+            i.putExtra(String.valueOf(R.string.KEY),note.getId());
+            context.startActivity(i);
         });
 
-        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onButtonClicked(note);
-            }
-        });
+        holder.btnDelete.setOnClickListener(v -> listener.onButtonClicked(note));
     }
     @Override
     public int getItemCount() {

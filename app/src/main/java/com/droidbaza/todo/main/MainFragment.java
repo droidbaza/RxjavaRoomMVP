@@ -1,28 +1,37 @@
 package com.droidbaza.todo.main;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.droidbaza.todo.R;
 import com.droidbaza.todo.adapters.AdapterListener;
 import com.droidbaza.todo.adapters.NoteAdapter;
-import com.droidbaza.todo.async.DeleteTask;
+import com.droidbaza.todo.database.DbClient;
 import com.droidbaza.todo.model.Note;
 import java.util.List;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+/**
+ * Created by droidbaza on 16/10/19.
+ */
 
 public class MainFragment extends Fragment implements MainContract.MainView, AdapterListener {
 
 
-    private RecyclerView rvNotes;
+    @BindView(R.id.rv_notes)
+    RecyclerView rvNotes;
+
+    private Unbinder unbinder;
     private NoteAdapter mAdapter;
 
     @Override
@@ -35,15 +44,12 @@ public class MainFragment extends Fragment implements MainContract.MainView, Ada
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.content_main, container, false);
-        rvNotes = v.findViewById(R.id.rv_notes);
-        LinearLayoutManager llm = new LinearLayoutManager(getContext());
-        rvNotes.setLayoutManager(llm);
+        unbinder = ButterKnife.bind(this,v);
         return v;
     }
 
     @Override
     public void showMyNotes(List<Note> myNotes) {
-
         mAdapter = new NoteAdapter(myNotes,getContext(),this);
         mAdapter.notifyDataSetChanged();
         rvNotes.setAdapter(mAdapter);
@@ -55,11 +61,20 @@ public class MainFragment extends Fragment implements MainContract.MainView, Ada
         builder.setMessage("Удалить заметку?")
                 .setCancelable(false)
                 .setPositiveButton("Да", (dialog, id) -> {
-                    new DeleteTask(note,getContext()).execute();
+                    Completable.fromAction(() -> DbClient.getInstance(getContext())
+                            .getMyDb().myDao().delete(note)).subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe();
                     mAdapter.notifyDataSetChanged();
                 })
                 .setNegativeButton("Нет", (dialog, id) -> {
                 });
         builder.create().show();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

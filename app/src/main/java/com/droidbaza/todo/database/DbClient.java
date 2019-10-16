@@ -2,7 +2,11 @@ package com.droidbaza.todo.database;
 import androidx.room.Room;
 import android.content.Context;
 
-import com.droidbaza.todo.database.MyDatabase;
+import com.droidbaza.todo.R;
+
+/**
+ * Created by droidbaza on 16/10/19.
+ */
 
 public class DbClient {
 
@@ -10,7 +14,7 @@ public class DbClient {
     private MyDatabase myDb;
 
     private DbClient(Context context) {
-        myDb = Room.databaseBuilder(context, MyDatabase.class, "TabNote").build();
+        myDb = Room.databaseBuilder(context, MyDatabase.class, context.getString(R.string.Tab)).build();
     }
 
     public static synchronized DbClient getInstance(Context context) {

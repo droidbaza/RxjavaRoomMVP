@@ -5,20 +5,23 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
-
 import com.droidbaza.todo.model.Note;
-
 import java.util.List;
+/**
+ * Created by droidbaza on 16/10/19.
+ */
 
-// Dao - описываем методы для работы с базой данных
 @Dao
 public interface MyDao {
 
     @Query("SELECT * FROM note")
     LiveData<List<Note>>getAll();
 
+    @Query("SELECT * FROM note WHERE id = :noteId")
+    LiveData<Note> getById(long noteId);
+
     @Insert
-    void insert(Note note);
+    long insert(Note note);
 
     @Delete
     void delete(Note note);
